@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ config['SITE_TITLE'] }}</title>
+    <meta charset="UTF-8">
+
+    {# <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"> #}
+
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+</html>
