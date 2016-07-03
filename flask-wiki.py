@@ -1,17 +1,19 @@
 # FIXME: DOCUMENTATION
 from json import load, dumps
 from passlib.hash import sha256_crypt
-from flask import Flask, session, flash, request, render_template, redirect, url_for
+from flask import Flask, session, flash, request, render_template, redirect, url_for, abort
 
 app = Flask(__name__)
+app.template_folder = app.root_path + '/system/templates/'
 app.config.update(
     DEBUG=True,
     SECRET_KEY='Every pony is the best pony!',
     SESSION_COOKIE_NAME='library',
     SITE_TITLE='Flask Wiki',
-    USERS_PATH=app.root_path + '/system/users/'
+    USERS_PATH=app.root_path + '/system/users/',
+    PAGES_PATH=app.static_folder + '/pages/',
+    DUMPS_PATH=app.static_folder + '/dumps/',
 )
-
 
 @app.route('/')
 def main():
@@ -79,9 +81,27 @@ def logout():
     if 'username' in session:
         session.pop('username', None)
         flash('You successfully logged out!', 'info')
-        return redirect('/')
+        return redirect(url_for('main'))
     flash('You are not logged in!', 'error')
-    return redirect('/')
+    return redirect(url_for('main'))
+
+
+@app.route('/page/<page_name>')
+def page(page_name):  # TODO: error handling
+    """ Render page with content from page file """
+    if '@' in page_name:  # check for stamp file
+        page_path = app.config['DUMPS_PATH'] + page_name
+    else:
+        page_path = app.config['PAGES_PATH'] + page_name
+    try:
+        page_file = open(page_path, 'r')
+        content = page_file.read()
+        page_file.close()
+        return render_template('page.html', content=content)
+    except FileNotFoundError:
+        abort(404)  # TODO: error handling
+    except Exception:
+        abort(500)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>THIS IS SAMPLE PAGE</h1>
+    {% autoescape none %}
+    {{ content }}
+    {% endautoescape %}
+{% endblock %}
