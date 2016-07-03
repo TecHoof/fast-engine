@@ -176,6 +176,16 @@ def dump_page(page_name):  # FIXME
     shutil.copyfile(page_file, stamp_file)
 
 
+def dumps_list(page_name):  # TODO: test this
+    stamps = []
+    for root, dirs, files in os.walk(app.config['DUMPS_PATH']):
+        for stamp_name in files:
+            stamp_name = stamp_name.split('@')
+            if page_name in stamp_name:
+                stamps.append(stamp_name[1])  # timestamp
+    return stamps
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
