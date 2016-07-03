@@ -158,14 +158,32 @@ def delete_page():
     if 'username' not in session:         #
         g.login_back = request.path       #
         abort(403)                        # FIXME: decorate this!
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
-            page_name = request.args.get('title')
+            page_name = request.form.get('title')
             dump_page(page_name)
             os.remove(app.config['PAGES_PATH'] + page_name)
             flash('Success!', 'info')
         except OSError:
             flash('That page does not exist!', 'error')
+    return redirect(url_for('main'))
+
+
+@app.route('/restore/', methods=['POST'])
+def restore():  # TODO: test this
+    # FIXME: DOCUMENTATION
+    if 'username' not in session:         #
+        g.login_back = request.path       #
+        abort(403)                        # FIXME: decorate this!
+    page_name = request.form.get('title')
+    timestamp = request.form.get('time')
+    page_file = app.config['PAGES_PATH'] + page_name
+    dump_file = app.config['DUMPS_PATH'] + page_name + '@' + timestamp
+    try:
+        shutil.copyfile(dump_file, page_file)
+        flash('Success!', 'info')
+    except OSError:
+        flash('Can not restore this page!', 'error')
     return redirect(url_for('main'))
 
 
@@ -176,14 +194,14 @@ def dump_page(page_name):  # FIXME
     shutil.copyfile(page_file, stamp_file)
 
 
-def dumps_list(page_name):  # TODO: test this
-    stamps = []
+def show_dumps(page_name):  # TODO: test this
+    dumps_list = []
     for root, dirs, files in os.walk(app.config['DUMPS_PATH']):
-        for stamp_name in files:
-            stamp_name = stamp_name.split('@')
-            if page_name in stamp_name:
-                stamps.append(stamp_name[1])  # timestamp
-    return stamps
+        for dump_name in files:
+            dump_name = dump_name.split('@')
+            if page_name in dump_name:
+                dumps_list.append(dump_name[1])  # timestamp
+    return dumps_list
 
 
 @app.errorhandler(404)
