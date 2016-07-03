@@ -1,7 +1,12 @@
 # FIXME: DOCUMENTATION
 from json import load, dumps
 from passlib.hash import sha256_crypt
-from flask import Flask, session, flash, request, render_template, redirect, url_for, abort
+
+import os
+import shutil
+import time
+
+from flask import Flask, session, flash, request, render_template, redirect, url_for, abort, g
 
 app = Flask(__name__)
 app.template_folder = app.root_path + '/system/templates/'
@@ -28,8 +33,8 @@ def login():  # TODO: error handling
         return redirect(url_for('main'))             # FIXME: decorate this!
     if request.method == 'POST':
         # TODO: add input check
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username', None)
+        password = request.form.get('password', None)
         app.logger.debug(request.form['username'])
         try:
             user_file = open(app.config['USERS_PATH'] + username, 'r')  # user_file on json format
@@ -45,8 +50,8 @@ def login():  # TODO: error handling
             flash('User not exist!', 'error')
             return redirect(url_for('login'))
         except Exception:
-            flash('Internal server error!', 'error')
-        return redirect(url_for('main'))
+            abort(500)
+        return redirect(request.args.get('next', url_for('main')))
 
     return render_template('login.html')
 
@@ -59,8 +64,8 @@ def reg():  # TODO: error handling
         return redirect(url_for('main'))             #
     if request.method == 'POST':
         # TODO: add input check
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username', None)
+        password = request.form.get('password', None)
         password = sha256_crypt.encrypt(password)
         try:
             user_file = open(app.config['USERS_PATH'] + username, 'x')
@@ -87,7 +92,7 @@ def logout():
 
 
 @app.route('/page/<page_name>')
-def page(page_name):  # TODO: error handling
+def page(page_name):
     """ Render page with content from page file """
     if '@' in page_name:  # check for stamp file
         page_path = app.config['DUMPS_PATH'] + page_name
@@ -99,9 +104,74 @@ def page(page_name):  # TODO: error handling
         page_file.close()
         return render_template('page.html', content=content)
     except FileNotFoundError:
-        abort(404)  # TODO: error handling
+        abort(404)
     except Exception:
         abort(500)
+
+
+@app.route('/write/', methods=['POST', 'GET'])
+def write():  # TODO: error handling
+    # FIXME: DOCUMENTATION
+    if 'username' not in session:         #
+        g.login_back = request.path       #
+        abort(403)                        # FIXME: decorate this!
+    if request.method == 'POST':
+        # TODO: add input check
+        page_name = request.form.get('title')
+        content = request.form.get('content')
+        create = request.form.get('create', '0')
+        page_file = app.config['PAGES_PATH'] + page_name
+        if create == '1' and os.path.isfile(page_file):
+            flash('Page already exist with same name!', 'error')
+        else:
+            try:
+                if create != '1':
+                    dump_page(page_name)
+                page_file = open(page_file, 'w')
+                page_file.write(content)
+                page_file.close()
+                flash('Success!', 'info')
+                return redirect(url_for('page', page_name=page_name))
+            except OSError:
+                flash('Error writing to file!', 'error')
+
+    return render_template('editor.html', context={})
+
+
+@app.route('/write/<page_name>', methods=['POST', 'GET'])
+def edit(page_name):  # TODO: error handling
+    # FIXME: DOCUMENTATION
+    content = ''
+    page_file = app.config['PAGES_PATH'] + page_name
+    try:
+        page_file = open(page_file, 'r')
+        content = page_file.read()
+        page_file.close()
+    except OSError:
+        abort(404)
+    return render_template('editor.html', context={'title': page_name, 'content': content})
+
+
+def dump_page(page_name):  # FIXME
+    """ Backup current page to <dumps_path> directory """
+    page_file = app.config['PAGES_PATH'] + page_name
+    stamp_file = app.config['DUMPS_PATH'] + page_name + '@' + str(int(time.time()))
+    shutil.copyfile(page_file, stamp_file)
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(403)
+def access_denied(error):
+    return render_template('403.html'), 403
+
+
+@app.errorhandler(500)
+def something_wrong(error):
+    return render_template('500.html'), 500
 
 
 if __name__ == '__main__':

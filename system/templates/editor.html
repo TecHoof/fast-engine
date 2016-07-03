@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Editor</h2>
+<form action="{{ url_for('write') }}" method="POST">
+    <input type="checkbox" name="create" value="1">
+    <input placeholder="Title post" title="title" type="text" name="title" value="{{ context.title }}">
+    <textarea placeholder="Body post" title="content" name="content">{{ context.content }}</textarea>
+    <input type="submit" value="submit">
+    <input type="reset" value="reset">
+</form>
+
+{% endblock %}
