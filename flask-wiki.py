@@ -102,7 +102,7 @@ def page(page_name):
         page_file = open(page_path, 'r')
         content = page_file.read()
         page_file.close()
-        return render_template('page.html', content=content)
+        return render_template('page.html', context={'title': page_name, 'content': content})
     except FileNotFoundError:
         abort(404)
     except Exception:
@@ -150,6 +150,23 @@ def edit(page_name):  # TODO: error handling
     except OSError:
         abort(404)
     return render_template('editor.html', context={'title': page_name, 'content': content})
+
+
+@app.route('/delete/', methods=['POST', 'GET'])
+def delete_page():
+    # FIXME: DOCUMENTATION
+    if 'username' not in session:         #
+        g.login_back = request.path       #
+        abort(403)                        # FIXME: decorate this!
+    if request.method == 'GET':
+        try:
+            page_name = request.args.get('title')
+            dump_page(page_name)
+            os.remove(app.config['PAGES_PATH'] + page_name)
+            flash('Success!', 'info')
+        except OSError:
+            flash('That page does not exist!', 'error')
+    return redirect(url_for('main'))
 
 
 def dump_page(page_name):  # FIXME
