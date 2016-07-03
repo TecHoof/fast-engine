@@ -66,6 +66,10 @@ def reg():  # TODO: error handling
         # TODO: add input check
         username = request.form.get('username', None)
         password = request.form.get('password', None)
+        security_code = request.form.get('security_code', None)
+        if not check_security_code(security_code):
+            flash('Security code invalid!', 'error')
+            return redirect(url_for('reg'))
         password = sha256_crypt.encrypt(password)
         try:
             user_file = open(app.config['USERS_PATH'] + username, 'x')
@@ -187,6 +191,15 @@ def restore():  # TODO: test this
     return redirect(url_for('main'))
 
 
+def check_security_code(security_code):  # FIXME: rewrite this shit!
+    codes_file = open(app.root_path + '/security_codes.db', 'r')
+    codes = codes_file.readlines()
+    codes_file.close()
+    if security_code + '\n' in codes:
+        return True
+    return False
+
+
 def dump_page(page_name):  # FIXME
     """ Backup current page to <dumps_path> directory """
     dumps_list = show_dumps(page_name)
@@ -224,4 +237,7 @@ def something_wrong(error):
 
 
 if __name__ == '__main__':
+    f = open('security_codes.db', 'w')
+    f.write('11111\n')
+    f.close()
     app.run()
