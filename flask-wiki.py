@@ -189,6 +189,10 @@ def restore():  # TODO: test this
 
 def dump_page(page_name):  # FIXME
     """ Backup current page to <dumps_path> directory """
+    dumps_list = show_dumps(page_name)
+    print(dumps_list)
+    if len(dumps_list) > 9:
+        os.remove(app.config['DUMPS_PATH'] + page_name + '@' + dumps_list[0])
     page_file = app.config['PAGES_PATH'] + page_name
     stamp_file = app.config['DUMPS_PATH'] + page_name + '@' + str(int(time.time()))
     shutil.copyfile(page_file, stamp_file)
@@ -201,7 +205,7 @@ def show_dumps(page_name):  # TODO: test this
             dump_name = dump_name.split('@')
             if page_name in dump_name:
                 dumps_list.append(dump_name[1])  # timestamp
-    return dumps_list
+    return sorted(dumps_list)
 
 
 @app.errorhandler(404)
