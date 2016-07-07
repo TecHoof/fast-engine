@@ -54,3 +54,7 @@ def show_dumps(page_name):  # TODO: test this
             if page_name in dump_name:
                 dumps_list.append(dump_name[1])  # timestamp
     return sorted(dumps_list)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']

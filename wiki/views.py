@@ -5,13 +5,15 @@ Views handlers here.
 """
 import os
 import shutil
+from uuid import uuid4
 from passlib.hash import sha256_crypt
 
 from flask import session, flash, request, render_template, redirect, url_for, abort, escape, safe_join
 from flask.json import load
+from werkzeug.utils import secure_filename
 
 from wiki import app
-from wiki.helpers import login_check, access_check, dump_page
+from wiki.helpers import login_check, access_check, dump_page, allowed_file
 
 
 @app.route('/')
@@ -55,8 +57,6 @@ def logout():
     if 'username' in session:
         session.pop('username', None)
         flash('You successfully logged out!', 'info')
-        return redirect(url_for('main'))
-    flash('You are not logged in!', 'error')
     return redirect(url_for('main'))
 
 
@@ -154,6 +154,20 @@ def restore():  # TODO: test this; FIXME: error 405
     except OSError:
         flash('Can not restore this page!', 'error')
     return redirect(url_for('main'))
+
+
+@app.route('/upload/', methods=['GET', 'POST'])
+@access_check
+def upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(safe_join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File ' + filename + ' was uploaded!', 'info')
+        else:
+            flash('File was not uploaded!', 'error')
+    return render_template('upload.html', context={})
 
 
 @app.errorhandler(404)
