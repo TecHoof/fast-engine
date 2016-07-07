@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Access denied!
+{% endblock %}
+
 {% block content %}
     You have no power here!
     <a href="{{ url_for('login', next=g['login_back']) }}">Login</a> or <a href="{{ url_for('main') }}">go away!</a>

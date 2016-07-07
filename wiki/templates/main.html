@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Main
+{% endblock %}
+
 {% block content %}
     {% if 'username' in session %}
         Hello, {{ session['username'] }} <a href="{{ url_for('logout') }}">Logout</a>
