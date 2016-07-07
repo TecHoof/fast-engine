@@ -12,13 +12,13 @@ app.config.update(
     SECRET_KEY='Every pony is the best pony!',
     SESSION_COOKIE_NAME='library',
     SITE_TITLE='wiki Engine',
-    USERS_PATH=app.root_path + '/users/',
-    PAGES_PATH=app.static_folder + '/pages/',
-    DUMPS_PATH=app.static_folder + '/dumps/',
+    USERS_FOLDER=app.root_path + '/users/',
+    PAGES_FOLDER=app.static_folder + '/pages/',
+    DUMPS_FOLDER=app.static_folder + '/dumps/',
+    UPLOAD_FOLDER=app.static_folder + '/files/',
     SUPERADMIN_LOGIN='Braunly',
     SUPERADMIN_PASSWORD='123',
     ALLOWED_EXTENSIONS=['apng', 'png', 'jpg', 'jpeg', 'gif'],
-    UPLOAD_FOLDER=app.static_folder + '/files/',
     MAX_CONTENT_LENGTH=16 * 1024 * 1024,
 )
 

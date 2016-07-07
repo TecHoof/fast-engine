@@ -13,7 +13,7 @@ from flask.json import load
 from werkzeug.utils import secure_filename
 
 from wiki import app
-from wiki.helpers import login_check, access_check, dump_page, allowed_file
+from wiki.helpers import login_check, access_check, dump_page, allowed_file, file_from_url
 
 
 @app.route('/')
@@ -33,7 +33,7 @@ def login():
             flash('Fill all fields!', 'error')
             return redirect(url_for('login'))
         try:
-            user_file = safe_join(app.config['USERS_PATH'], username)
+            user_file = safe_join(app.config['USERS_FOLDER'], username)
             with open(user_file, 'r') as uf:
                 user_conf = load(uf)  # user_file on json format
             if not sha256_crypt.verify(password, user_conf['password']):  # check password
@@ -65,9 +65,9 @@ def page(page_name):
     """ Render page with content from page file """
     page_name = escape(page_name)
     if '@' in page_name:  # check for dump file
-        page_path = safe_join(app.config['DUMPS_PATH'], page_name)
+        page_path = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
-        page_path = safe_join(app.config['PAGES_PATH'], page_name)
+        page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
         with open(page_path, 'r') as page_file:
             content = page_file.read()
@@ -81,7 +81,7 @@ def page(page_name):
 @app.route('/write/', methods=['POST', 'GET'])
 @access_check
 def write():
-    """ Create new page with <page_name> filename in <PAGES_PATH> const. """
+    """ Create new page with <page_name> filename in <PAGES_FOLDER> const. """
     if request.method == 'POST':
         page_name = escape(request.form.get('title', None))
         content = escape(request.form.get('content', None))
@@ -89,7 +89,7 @@ def write():
         if page_name is None:
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
-        page_path = safe_join(app.config['PAGES_PATH'], page_name)
+        page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
         if create == '1' and os.path.isfile(page_path):
             flash('Page already exist with same name!', 'error')
         else:
@@ -108,10 +108,10 @@ def write():
 @app.route('/write/<page_name>', methods=['POST', 'GET'])
 @access_check
 def edit(page_name):
-    """ Edit existed page with <page_name> title"""
+    """ Edit existed page with <page_name> title """
     content = ''
     page_name = escape(page_name)
-    page_path = safe_join(app.config['PAGES_PATH'], page_name)
+    page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
         with open(page_path, 'r') as page_file:
             content = page_file.read()
@@ -130,7 +130,7 @@ def delete_page():
             if page_name is None:
                 raise OSError  # hrr
             dump_page(page_name)
-            os.remove(safe_join(app.config['PAGES_PATH'], page_name))
+            os.remove(safe_join(app.config['PAGES_FOLDER'], page_name))
             flash('Success!', 'info')
         except OSError:
             flash('That page does not exist!', 'error')
@@ -146,8 +146,8 @@ def restore():  # TODO: test this; FIXME: error 405
     if page_name is None or timestamp is None:
         flash('Fill all fields!', 'error')
         return redirect(url_for('main'))
-    page_file = safe_join(app.config['PAGES_PATH'], page_name)
-    dump_file = safe_join(app.config['DUMPS_PATH'], page_name + '@' + timestamp)  # TODO: TEST!!!
+    page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
+    dump_file = safe_join(app.config['DUMPS_FOLDER'], page_name + '@' + timestamp)  # TODO: TEST!!!
     try:
         shutil.copyfile(dump_file, page_file)
         flash('Success!', 'info')
@@ -159,6 +159,8 @@ def restore():  # TODO: test this; FIXME: error 405
 @app.route('/upload/', methods=['GET', 'POST'])
 @access_check
 def upload():
+    """ File uploading handler. """
+    url = request.args.get('url', None)
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
@@ -167,6 +169,16 @@ def upload():
             flash('File ' + filename + ' was uploaded!', 'info')
         else:
             flash('File was not uploaded!', 'error')
+    if url is not None:
+        file = file_from_url(url)
+        if file and allowed_file(file['name']):
+            file_name = secure_filename(file['name'])
+            file_path = safe_join(app.config['UPLOAD_FOLDER'], file_name)
+            with open(file_path, 'wb') as f:
+                f.write(file['content'])
+            flash('File ' + file_name + ' was uploaded!', 'info')
+        else:
+            flash('Can not download file!', 'error')
     return render_template('upload.html', context={})
 
 
