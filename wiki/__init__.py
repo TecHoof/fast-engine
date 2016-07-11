@@ -16,6 +16,7 @@ app.config.update(
     PAGES_FOLDER=app.static_folder + '/pages/',
     DUMPS_FOLDER=app.static_folder + '/dumps/',
     UPLOAD_FOLDER=app.static_folder + '/files/',
+    SETTINGS_FOLDER=app.root_path + '/settings/',
     SUPERADMIN_LOGIN='Braunly',
     SUPERADMIN_PASSWORD='123',
     ALLOWED_EXTENSIONS=['apng', 'png', 'jpg', 'jpeg', 'gif'],

@@ -5,7 +5,8 @@ Views handlers here.
 """
 import os
 import shutil
-from uuid import uuid4
+import time
+# from uuid import uuid4
 from passlib.hash import sha256_crypt
 
 from flask import session, flash, request, render_template, redirect, url_for, abort, escape, safe_join
@@ -13,7 +14,7 @@ from flask.json import load
 from werkzeug.utils import secure_filename
 
 from wiki import app
-from wiki.helpers import login_check, access_check, dump_page, allowed_file, file_from_url
+from wiki.helpers import login_check, access_check, dump_page, allowed_file, file_from_url, settings_read, settings_write
 
 
 @app.route('/')
@@ -41,7 +42,8 @@ def login():
                 return redirect(url_for('login'))
             else:
                 flash('You successfully logged in!', 'info')
-                session['username'] = request.form['username']
+                session['username'] = username
+                settings_write(username, 'last_login', time.time())
         except FileNotFoundError:
             flash('User not exist!', 'error')
             return redirect(url_for('login'))
@@ -85,7 +87,7 @@ def write():
     if request.method == 'POST':
         page_name = escape(request.form.get('title', None))
         content = escape(request.form.get('content', None))
-        create = request.form.get('create', '0')
+        create = request.form.get('create', '0')  # default zero; TODO: rewrite this
         if page_name is None:
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
@@ -98,6 +100,8 @@ def write():
                     dump_page(page_name)
                 with open(page_path, 'w') as page_file:
                     page_file.write(content)
+                settings_write(page_name, 'last_author', session['username'])
+                settings_write(page_name, 'last_change', time.time())
                 flash('Success!', 'info')
                 return redirect(url_for('page', page_name=page_name))
             except OSError:
@@ -131,6 +135,7 @@ def delete_page():
                 raise OSError  # hrr
             dump_page(page_name)
             os.remove(safe_join(app.config['PAGES_FOLDER'], page_name))
+            settings_write(page_name, 'deleted', time.time())
             flash('Success!', 'info')
         except OSError:
             flash('That page does not exist!', 'error')
