@@ -6,6 +6,7 @@
 
 {% block content %}
     <h1>{{ context.title }}</h1>
+    <h3>Last changed on {{ context.settings.last_change }} by {{ context.settings.last_author }}</h3>
     {% autoescape none %}
     {{ context.content }}
     {% endautoescape %}

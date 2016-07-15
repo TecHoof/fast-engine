@@ -41,7 +41,6 @@ def access_check(func):
 def dump_page(page_name=None):
     """ Backup current page to <dumps_path> directory """
     dumps_list = show_dumps(page_name)
-    print(dumps_list)
     if len(dumps_list) > 9:
         os.remove(app.config['DUMPS_FOLDER'] + page_name + '@' + dumps_list[0])
     page_file = safe_join(app.config['PAGES_FOLDER'], page_name)

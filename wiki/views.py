@@ -66,19 +66,24 @@ def logout():
 @app.route('/page/<page_name>')
 def page(page_name):
     """ Render page with content from page file """
+    if not page_name:
+        abort(404)
     page_name = escape(page_name)
+    content = ''
+    settings = settings_read(page_name)
+    settings['last_change'] = datetime.datetime.fromtimestamp(settings['last_change']).strftime('%d-%m-%Y %H:%M')
     if '@' in page_name:  # check for dump file
-        page_path = safe_join(app.config['DUMPS_FOLDER'], page_name)
+        page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
-        page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
+        page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
-        with open(page_path, 'r') as page_file:
-            content = page_file.read()
-        return render_template('page.html', context={'title': page_name, 'content': content})
+        with open(page_file, 'r') as f:
+            content = f.read()
     except FileNotFoundError:
         abort(404)
     except Exception:
         abort(500)
+    return render_template('page.html', context={'title': page_name, 'content': content, 'settings': settings})
 
 
 @app.route('/write/', methods=['POST', 'GET'])
@@ -92,21 +97,21 @@ def write():
         if not page_name:
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
-        page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
-        if create == '1' and os.path.isfile(page_path):
+        page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
+        if create == '1' and os.path.isfile(page_file):
             flash('Page already exist with same name!', 'error')
         else:
             try:
                 if create != '1':
                     dump_page(page_name)
-                with open(page_path, 'w') as page_file:
-                    page_file.write(content)
+                with open(page_file, 'w') as f:
+                    f.write(content)
                 settings_write(page_name, 'last_author', session['username'])
                 settings_write(page_name, 'last_change', int(time.time()))
                 flash('Success!', 'info')
                 return redirect(url_for('page', page_name=page_name))
             except OSError:
-                flash('Error writing to file!', 'error')
+                flash('Can not save page!', 'error')
     return render_template('editor.html', context={})
 
 
@@ -116,10 +121,10 @@ def edit(page_name):
     """ Edit existed page with <page_name> title """
     content = ''
     page_name = escape(page_name)
-    page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
+    page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
-        with open(page_path, 'r') as page_file:
-            content = page_file.read()
+        with open(page_file, 'r') as f:
+            content = f.read()
     except OSError:
         abort(404)
     return render_template('editor.html', context={'title': page_name, 'content': content})
@@ -204,6 +209,7 @@ def upload():
 
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])
 def feedback(page_name):
+    """ Write user feedback to file. """
     if page_name == '':
         abort(404)
     if request.method == 'POST':
