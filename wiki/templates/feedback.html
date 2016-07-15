@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Feedback on {{ context.title }}
+{% endblock %}
+
+{% block content %}
+    Write your feedback on <a href="{{ url_for("page", page_name=context.title) }}">{{ context.title }}</a>
+<form action="" method="POST">
+    <input name="name" type="text" placeholder="Your name">
+    <input name="email" type="text" placeholder="Your email">
+    <textarea name="content" placeholder="Your feedback"></textarea>
+    <input type="submit">
+</form>
+{% endblock %}

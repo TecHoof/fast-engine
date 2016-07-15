@@ -43,7 +43,7 @@ def login():
             else:
                 flash('You successfully logged in!', 'info')
                 session['username'] = username
-                settings_write(username, 'last_login', time.time())
+                settings_write(username, 'last_login', int(time.time()))
         except FileNotFoundError:
             flash('User not exist!', 'error')
             return redirect(url_for('login'))
@@ -101,7 +101,7 @@ def write():
                 with open(page_path, 'w') as page_file:
                     page_file.write(content)
                 settings_write(page_name, 'last_author', session['username'])
-                settings_write(page_name, 'last_change', time.time())
+                settings_write(page_name, 'last_change', int(time.time()))
                 flash('Success!', 'info')
                 return redirect(url_for('page', page_name=page_name))
             except OSError:
@@ -135,7 +135,7 @@ def delete_page():
                 raise OSError  # hrr
             dump_page(page_name)
             os.remove(safe_join(app.config['PAGES_FOLDER'], page_name))
-            settings_write(page_name, 'deleted', time.time())
+            settings_write(page_name, 'deleted', int(time.time()))
             flash('Success!', 'info')
         except OSError:
             flash('That page does not exist!', 'error')
@@ -185,6 +185,26 @@ def upload():
         else:
             flash('Can not download file!', 'error')
     return render_template('upload.html', context={})
+
+
+@app.route('/feedback/<page_name>', methods=['GET', 'POST'])
+def feedback(page_name):
+    if page_name == '':
+        abort(404)
+    if request.method == 'POST':
+        name = escape(request.form.get('name', ''))
+        email = escape(request.form.get('email', ''))
+        content = request.form.get('content', '')
+        timestamp = str(int(time.time()))
+        file = safe_join(app.config['FEEDBACK_FOLDER'], '%'.join([page_name, name, email, timestamp]))
+        if not name or not email or not content:
+            flash('Please, fill all fields!', 'error')
+            return redirect(url_for('feedback', page_name=page_name))
+        with open(file, 'w') as f:
+            f.write(content)
+        flash('Thank you for feedback.', 'info')
+        return redirect(url_for('page', page_name=page_name))
+    return render_template('feedback.html', context={"title":page_name})
 
 
 @app.errorhandler(404)
