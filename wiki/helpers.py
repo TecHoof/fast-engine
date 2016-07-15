@@ -95,21 +95,28 @@ def settings_read(name=None):
     return content
 
 
-def create_user(username=None, password=None):
-    """ Create user """
-    user_file = safe_join(app.config['USERS_FOLDER'], username)
-    password = sha256_crypt.encrypt(password)
-    with open(user_file, 'x') as f:
-        dump({'password': password}, f)
-    settings_write(username, 'create', int(time.time()))
+class Admin:
+    @staticmethod
+    def create_user(username=None, password=None):
+        """ Create user """
+        user_file = safe_join(app.config['USERS_FOLDER'], username)
+        password = sha256_crypt.encrypt(password)
+        with open(user_file, 'x') as f:
+            dump({'password': password}, f)
+        settings_write(username, 'create', int(time.time()))
 
+    @staticmethod
+    def delete_user(username=None):
+        user_file = safe_join(app.config['USERS_FOLDER'], username)
+        os.remove(user_file)
 
-def show_users():
-    """ Return list of users """
-    users_list = []
-    for root, dirs, files in os.walk(app.config['USERS_FOLDER']):
-        for user in files:
-            if '.' in user:
-                continue
-            users_list.append(user)
-    return sorted(users_list)
+    @staticmethod
+    def show_users():
+        """ Return list of users """
+        users_list = []
+        for root, dirs, files in os.walk(app.config['USERS_FOLDER']):
+            for user in files:
+                if '.' in user:
+                    continue
+                users_list.append(user)
+        return sorted(users_list)

@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write, show_users, create_user
+    settings_write, Admin
 
 
 @app.route('/')
@@ -236,14 +236,15 @@ def admin():
     if session['username'] != app.config['SUPERADMIN_LOGIN']:
         abort(403)
     if request.method == 'POST':
-        if request.form.get('form') == 'create_user':
+        form = request.form.get('form')
+        if form == 'create_user':
             username = escape(request.form.get('username', ''))
             password = request.form.get('password', '')
             if not username or not password:
                 flash('Fill all fields!', 'error')
                 return redirect(url_for('admin'))
             try:
-                create_user(username, password)
+                Admin.create_user(username, password)
                 flash('Success!', 'info')
             except FileExistsError:
                 flash('User exist!', 'error')
@@ -253,7 +254,21 @@ def admin():
                 abort(500)
             finally:
                 return redirect(url_for('admin'))
-    return render_template('admin.html', context={"users": show_users()})
+        elif form == 'delete_user':
+            username = escape(request.form.get('username', ''))
+            if not username:
+                flash('Fill all fields!', 'error')
+                return redirect(url_for('admin'))
+            try:
+                Admin.delete_user(username)
+                flash('Success!', 'info')
+            except FileNotFoundError:
+                flash('User not found!', 'error')
+            except Exception:
+                abort(500)
+            finally:
+                return redirect(url_for('admin'))
+    return render_template('admin.html', context={"users": Admin.show_users()})
 
 
 @app.errorhandler(401)
