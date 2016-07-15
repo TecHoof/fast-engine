@@ -6,7 +6,7 @@ Views handlers here.
 import os
 import shutil
 import time
-# from uuid import uuid4
+import datetime
 from passlib.hash import sha256_crypt
 
 from flask import session, flash, request, render_template, redirect, url_for, abort, escape, safe_join
@@ -14,7 +14,8 @@ from flask.json import load
 from werkzeug.utils import secure_filename
 
 from wiki import app
-from wiki.helpers import login_check, access_check, dump_page, allowed_file, file_from_url, settings_read, settings_write
+from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
+    settings_write
 
 
 @app.route('/')
@@ -30,7 +31,7 @@ def login():
     if request.method == 'POST':
         username = escape(request.form.get('username', None))
         password = request.form.get('password', None)
-        if username is None or password is None:
+        if not username or not password:
             flash('Fill all fields!', 'error')
             return redirect(url_for('login'))
         try:
@@ -47,7 +48,7 @@ def login():
         except FileNotFoundError:
             flash('User not exist!', 'error')
             return redirect(url_for('login'))
-        except Exception:
+        except Exception:  # FIXME!!!
             abort(500)
         return redirect(request.args.get('next', url_for('main')))
     return render_template('login.html')
@@ -88,7 +89,7 @@ def write():
         page_name = escape(request.form.get('title', None))
         content = escape(request.form.get('content', None))
         create = request.form.get('create', '0')  # default zero; TODO: rewrite this
-        if page_name is None:
+        if not page_name:
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
         page_path = safe_join(app.config['PAGES_FOLDER'], page_name)
@@ -131,7 +132,7 @@ def delete_page():
     if request.method == 'POST':
         try:
             page_name = escape(request.form.get('title', None))
-            if page_name is None:
+            if not page_name:
                 raise OSError  # hrr
             dump_page(page_name)
             os.remove(safe_join(app.config['PAGES_FOLDER'], page_name))
@@ -142,23 +143,34 @@ def delete_page():
     return redirect(url_for('main'))
 
 
-@app.route('/restore/', methods=['POST'])
+@app.route('/restore/<dump_name>', methods=['GET'])
 @access_check
-def restore():  # TODO: test this; FIXME: error 405
+def restore(dump_name):
     """ Restore page from dump storage """
-    page_name = escape(request.form.get('title', None))
-    timestamp = request.form.get('time', None, type=int)
-    if page_name is None or timestamp is None:
-        flash('Fill all fields!', 'error')
-        return redirect(url_for('main'))
-    page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
-    dump_file = safe_join(app.config['DUMPS_FOLDER'], page_name + '@' + timestamp)  # TODO: TEST!!!
-    try:
-        shutil.copyfile(dump_file, page_file)
-        flash('Success!', 'info')
-    except OSError:
-        flash('Can not restore this page!', 'error')
-    return redirect(url_for('main'))
+    if not dump_name:
+        abort(404)
+    if '@' in dump_name:
+        dump = dump_name.split('@')
+        page_file = safe_join(app.config['PAGES_FOLDER'], dump[0])
+        dump_file = safe_join(app.config['DUMPS_FOLDER'], dump[0] + '@' + dump[1])
+        try:
+            dump_page(dump[0])
+            shutil.copyfile(dump_file, page_file)
+            flash('Success!', 'info')
+        except OSError:
+            flash('Can not restore this page!', 'error')
+        finally:
+            return redirect(url_for('page', page_name=dump[0]))
+    dumps = []
+    timestamps = show_dumps(dump_name)
+    for timestamp in timestamps:
+        hr_time = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%d-%m-%Y %H:%M')
+        dump = {'timestamp': timestamp, 'hr_time': hr_time}
+        dumps.append(dump)
+    if not dumps:
+        flash('Dumps for this page not found!', 'error')
+        return redirect(url_for('page', page_name=dump_name))
+    return render_template('restore.html', context={"title": dump_name, "dumps": dumps})
 
 
 @app.route('/upload/', methods=['GET', 'POST'])

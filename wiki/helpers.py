@@ -30,15 +30,15 @@ def login_check(func):
 def access_check(func):
     """ Check for access to that handler """
     @wraps(func)
-    def wrapper():
+    def wrapper(*args, **kwargs):
         if 'username' not in session:
             g.login_back = request.path
             abort(403)
-        return func()
+        return func(*args, **kwargs)
     return wrapper
 
 
-def dump_page(page_name=None):  # FIXME
+def dump_page(page_name=None):
     """ Backup current page to <dumps_path> directory """
     dumps_list = show_dumps(page_name)
     print(dumps_list)
@@ -49,7 +49,7 @@ def dump_page(page_name=None):  # FIXME
     shutil.copyfile(page_file, stamp_file)
 
 
-def show_dumps(page_name=None):  # TODO: test this
+def show_dumps(page_name=None):
     """ Return list of dumped pages """
     dumps_list = []
     for root, dirs, files in os.walk(app.config['DUMPS_FOLDER']):
