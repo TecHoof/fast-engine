@@ -17,7 +17,7 @@ from wiki import app
 
 
 def login_check(func):
-    """ Check for user authorization """
+    """ Check for active login session """
     @wraps(func)
     def wrapper():
         if 'username' in session:
@@ -28,12 +28,12 @@ def login_check(func):
 
 
 def access_check(func):
-    """ Check for access to that handler """
+    """ Check for user authorization """
     @wraps(func)
     def wrapper(*args, **kwargs):
         if 'username' not in session:
             g.login_back = request.path
-            abort(403)
+            abort(401)
         return func(*args, **kwargs)
     return wrapper
 
