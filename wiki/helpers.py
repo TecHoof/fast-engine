@@ -89,7 +89,7 @@ def settings_read(name=None):
     """ Read from settings file """
     file = safe_join(app.config['SETTINGS_FOLDER'], name + '.json')
     try:
-        with open(file, 'r') as f:  # TODO: check for exist
+        with open(file, 'r') as f:
             content = load(f)
     except FileNotFoundError:
         content = {}

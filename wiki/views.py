@@ -125,21 +125,24 @@ def edit(page_name):
     return render_template('editor.html', context={'title': page_name, 'content': content})
 
 
-@app.route('/delete/', methods=['POST', 'GET'])
+@app.route('/delete/<page_name>', methods=['GET'])
 @access_check
-def delete_page():
-    """ Delete page with <title> filename. """
-    if request.method == 'POST':
-        try:
-            page_name = escape(request.form.get('title', None))
-            if not page_name:
-                raise OSError  # hrr
-            dump_page(page_name)
-            os.remove(safe_join(app.config['PAGES_FOLDER'], page_name))
-            settings_write(page_name, 'deleted', int(time.time()))
-            flash('Success!', 'info')
-        except OSError:
-            flash('That page does not exist!', 'error')
+def delete_page(page_name):
+    """ Delete page with <page_name> filename. """
+    if not page_name:
+        abort(404)
+    if '@' in page_name:
+        page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
+    else:
+        page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
+        dump_page(page_name)
+    try:
+        os.remove(page_file)
+        settings_write(page_name, 'deleted_by', session['username'])
+        settings_write(page_name, 'deleted_on', int(time.time()))
+        flash('Success!', 'info')
+    except OSError:
+        flash('That page does not exist!', 'error')
     return redirect(url_for('main'))
 
 
