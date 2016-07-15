@@ -31,26 +31,27 @@ def login():
     if request.method == 'POST':
         username = escape(request.form.get('username', None))
         password = request.form.get('password', None)
+        next_url = request.args.get('next', url_for('main'))
         if not username or not password:
             flash('Fill all fields!', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', next=next_url))
         try:
             user_file = safe_join(app.config['USERS_FOLDER'], username)
             with open(user_file, 'r') as uf:
                 user_conf = load(uf)  # user_file on json format
             if not sha256_crypt.verify(password, user_conf['password']):  # check password
                 flash('Wrong password!', 'error')
-                return redirect(url_for('login'))
+                return redirect(url_for('login', next=next_url))
             else:
                 flash('You successfully logged in!', 'info')
                 session['username'] = username
                 settings_write(username, 'last_login', int(time.time()))
         except FileNotFoundError:
             flash('User not exist!', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', next=next_url))
         except Exception:  # FIXME!!!
             abort(500)
-        return redirect(request.args.get('next', url_for('main')))
+        return redirect(next_url)
     return render_template('login.html')
 
 
