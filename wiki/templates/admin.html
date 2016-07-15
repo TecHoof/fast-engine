@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin panel
+{% endblock %}
+
+{% block content %}
+    Create user:
+    <form action="" method="POST">
+        <input type="hidden" name="form" value="create_user">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="submit">
+    </form>
+    {{ context }}
+{% endblock %}

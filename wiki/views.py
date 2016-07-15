@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write
+    settings_write, show_users, create_user
 
 
 @app.route('/')
@@ -226,6 +226,33 @@ def feedback(page_name):
         flash('Thank you for feedback.', 'info')
         return redirect(url_for('page', page_name=page_name))
     return render_template('feedback.html', context={"title":page_name})
+
+
+@app.route('/admin/', methods=['GET', 'POST'])
+@access_check
+def admin():
+    """ Admin panel handler. """
+    if session['username'] != app.config['SUPERADMIN_LOGIN']:
+        abort(403)
+    if request.method == 'POST':
+        if request.form.get('form') == 'create_user':
+            username = escape(request.form.get('username', ''))
+            password = request.form.get('password', '')
+            if not username or not password:
+                flash('Fill all fields!', 'error')
+                return redirect(url_for('admin'))
+            try:
+                create_user(username, password)
+                flash('Success!', 'info')
+            except FileExistsError:
+                flash('User exist!', 'error')
+            except OSError:
+                flash('Can not create new user!', 'error')
+            except Exception:
+                abort(500)
+            finally:
+                return redirect(url_for('admin'))
+    return render_template('admin.html', context={"users": show_users()})
 
 
 @app.errorhandler(401)
