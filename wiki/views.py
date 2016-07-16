@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write, Admin
+    settings_write, Admin, show_feedback
 
 
 @app.route('/')
@@ -71,16 +71,21 @@ def page(page_name):
         abort(404)
     page_name = escape(page_name)
     content = ''
-    settings = settings_read(page_name)
-    settings['last_change'] = datetime.datetime.fromtimestamp(settings['last_change']).strftime('%d-%m-%Y %H:%M')
-    if '@' in page_name:  # check for dump file
+    settings = []
+    if '$' in page_name:  # check for feedback file
+        page_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
+    elif '@' in page_name:
         page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
+        settings = settings_read(page_name)
+        settings['last_change'] = datetime.datetime.fromtimestamp(settings['last_change']).strftime('%d-%m-%Y %H:%M')
     try:
         with open(page_file, 'r') as f:
             content = f.read()
     except FileNotFoundError:
+        import traceback
+        traceback.print_exc()
         abort(404)
     except Exception:
         abort(500)
@@ -137,7 +142,9 @@ def delete_page(page_name):
     """ Delete page with <page_name> filename. """
     if not page_name:
         abort(404)
-    if '@' in page_name:
+    if '$' in page_name:
+        page_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
+    elif '@' in page_name:
         page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
@@ -211,14 +218,17 @@ def upload():
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])
 def feedback(page_name):
     """ Write user feedback to file. """
-    if page_name == '':
+    if not page_name:
         abort(404)
+    feedback_all = []
+    if 'username' in session:
+        feedback_all = show_feedback(page_name)
     if request.method == 'POST':
         name = escape(request.form.get('name', ''))
         email = escape(request.form.get('email', ''))
         content = request.form.get('content', '')
         timestamp = str(int(time.time()))
-        file = safe_join(app.config['FEEDBACK_FOLDER'], '%'.join([page_name, name, email, timestamp]))
+        file = safe_join(app.config['FEEDBACK_FOLDER'], '$'.join([page_name, name, email, timestamp]))
         if not name or not email or not content:
             flash('Please, fill all fields!', 'error')
             return redirect(url_for('feedback', page_name=page_name))
@@ -226,7 +236,7 @@ def feedback(page_name):
             f.write(content)
         flash('Thank you for feedback.', 'info')
         return redirect(url_for('page', page_name=page_name))
-    return render_template('feedback.html', context={"title":page_name})
+    return render_template('feedback.html', context={"title": page_name, "feedback": feedback_all})
 
 
 @app.route('/admin/', methods=['GET', 'POST'])

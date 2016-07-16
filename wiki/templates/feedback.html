@@ -5,6 +5,22 @@
 {% endblock %}
 
 {% block content %}
+    {% if 'username' in session %}
+        Feedback:<br>
+        <ul>
+        {% for feedback in context.feedback %}
+                <li>
+                    User: {{ feedback[1] }} Email: {{ feedback[2] }} Time: {{ feedback[3] }}
+                    <a href="{{ url_for('page', page_name=feedback[0]) }}">
+                        Show
+                    </a>
+                    <a href="{{ url_for('delete', page_name=feedback[0] }}">
+                        Delete
+                    </a>
+                </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
     Write your feedback on <a href="{{ url_for("page", page_name=context.title) }}">{{ context.title }}</a>
 <form action="" method="POST">
     <input name="name" type="text" placeholder="Your name">

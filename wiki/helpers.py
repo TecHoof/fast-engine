@@ -6,6 +6,7 @@ Some helpful function and decorators
 import os
 import shutil
 import time
+import datetime
 import requests
 from functools import wraps
 from passlib.hash import sha256_crypt
@@ -120,3 +121,16 @@ class Admin:
                     continue
                 users_list.append(user)
         return sorted(users_list)
+
+
+def show_feedback(page_name=None):
+    """ Return list of feedback """
+    feedback_list = []
+    for root, dirs, files in os.walk(app.config['FEEDBACK_FOLDER']):
+        for feedback_name in files:
+            feedback_name = feedback_name.split('$')
+            if page_name in feedback_name:
+                feedback_name[0] = '$'.join(feedback_name)  # change page name with feedback file name
+                feedback_name[3] = datetime.datetime.fromtimestamp(int(feedback_name[3])).strftime('%d-%m-%Y %H:%M')
+                feedback_list.append(feedback_name)
+    return sorted(feedback_list)
