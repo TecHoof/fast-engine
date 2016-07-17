@@ -5,6 +5,17 @@
 {% endblock %}
 
 {% block content %}
+    Uploaded files:
+    <ul>
+    {% for file in context.files %}
+        <li>
+            {{ file }}
+            <a href="{{ url_for('static', filename='files/' + file) }}">Show</a>
+            <a href="{{ url_for('upload', delete=file) }}">Delete</a>
+        </li>
+    {% endfor %}
+    </ul>
+    Upload new file:
     <form action="" method="POST" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit" value="Upload!">

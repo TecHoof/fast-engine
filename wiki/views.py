@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write, Admin, show_feedback
+    settings_write, Admin, show_feedback, show_files
 
 
 @app.route('/')
@@ -194,6 +194,7 @@ def restore(dump_name):
 def upload():
     """ File uploading handler. """
     url = request.args.get('url', None)
+    delete = request.args.get('delete', None)
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
@@ -212,7 +213,15 @@ def upload():
             flash('File ' + file_name + ' was uploaded!', 'info')
         else:
             flash('Can not download file!', 'error')
-    return render_template('upload.html', context={})
+    if delete is not None:
+        file = safe_join(app.config['UPLOAD_FOLDER'], delete)
+        try:
+            os.remove(file)
+            flash('Success!', 'info')
+        except FileNotFoundError:
+            flash('File not found!', 'error')
+    files = show_files()
+    return render_template('upload.html', context={"files": files})
 
 
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])

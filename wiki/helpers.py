@@ -134,3 +134,14 @@ def show_feedback(page_name=None):
                 feedback_name[3] = datetime.datetime.fromtimestamp(int(feedback_name[3])).strftime('%d-%m-%Y %H:%M')
                 feedback_list.append(feedback_name)
     return sorted(feedback_list)
+
+
+def show_files():
+    """ Return list of uploaded files """
+    files_list = []
+    for root, dirs, files in os.walk(app.config['UPLOAD_FOLDER']):
+        for file in files:
+            if '.gitignore' in file:
+                continue
+            files_list.append(file)
+    return sorted(files_list)
