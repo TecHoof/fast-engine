@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write, Admin, show_feedback, show_files
+    settings_write, Admin, show_feedback, show_files, show_pages
 
 
 @app.route('/')
@@ -78,8 +78,11 @@ def page(page_name):
         page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
-        settings = settings_read(page_name)
-        settings['last_change'] = datetime.datetime.fromtimestamp(settings['last_change']).strftime('%d-%m-%Y %H:%M')
+        try:
+            settings = settings_read(page_name)
+            settings['last_change'] = datetime.datetime.fromtimestamp(settings['last_change']).strftime('%d-%m-%Y %H:%M')
+        except KeyError:
+            flash('Please, use editor to create new page!', 'error')
     try:
         with open(page_file, 'r') as f:
             content = f.read()
@@ -295,9 +298,17 @@ def admin():
 @app.route('/search/', methods=['GET'])
 def search():
     query = request.args.get('q', None)
+    result = []
     if query is not None:
-        pass
-    return render_template('search.html', context={})
+        pages = show_pages()
+        for page_name in pages:
+            page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
+            with open(page_file) as f:
+                for line in f:
+                    if query in line:
+                        result.append({'name': page_name, 'line': line})
+    return render_template('search.html', context={"result": result})
+
 
 @app.errorhandler(401)
 def unauthorized(error):

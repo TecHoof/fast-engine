@@ -9,4 +9,19 @@
         <input type="text" name="q">
         <input type="submit">
     </form>
+    {% if context.result %}
+        Result:
+        <ul>
+        {% for page in context.result %}
+            <li>
+                <a href="{{ url_for('page', page_name=page.name) }}">{{ page.name }}</a>
+                <ul>
+                    <li>{{ page.line }}</li>
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        No result.
+    {% endif %}
 {% endblock %}

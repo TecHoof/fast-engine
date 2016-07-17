@@ -145,3 +145,14 @@ def show_files():
                 continue
             files_list.append(file)
     return sorted(files_list)
+
+
+def show_pages():
+    """ Return list of pages """
+    pages_list = []
+    for root, dirs, files in os.walk(app.config['PAGES_FOLDER']):
+        for page in files:
+            if '.gitignore' in page:
+                continue
+            pages_list.append(page)
+    return sorted(pages_list)
