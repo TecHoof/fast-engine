@@ -67,7 +67,7 @@ def logout():
 @app.route('/page/<page_name>')
 def page(page_name):
     """ Render page with content from page file """
-    if not page_name:
+    if not page_name or page_name == '.gitignore':
         abort(404)
     page_name = escape(page_name)
     content = ''
@@ -100,7 +100,7 @@ def write():
         page_name = escape(request.form.get('title', None))
         content = escape(request.form.get('content', None))
         create = request.form.get('create', '0')  # default zero; TODO: rewrite this
-        if not page_name:
+        if not page_name or page_name == '.gitignore':
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
@@ -127,6 +127,8 @@ def edit(page_name):
     """ Edit existed page with <page_name> title """
     content = ''
     page_name = escape(page_name)
+    if not page_name or page_name == '.gitignore':
+        abort(404)
     page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
         with open(page_file, 'r') as f:
@@ -140,7 +142,7 @@ def edit(page_name):
 @access_check
 def delete_page(page_name):
     """ Delete page with <page_name> filename. """
-    if not page_name:
+    if not page_name or page_name == '.gitignore':
         abort(404)
     if '$' in page_name:
         page_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
@@ -163,7 +165,7 @@ def delete_page(page_name):
 @access_check
 def restore(dump_name):
     """ Restore page from dump storage """
-    if not dump_name:
+    if not dump_name  or dump_name == '.gitignore':
         abort(404)
     if '@' in dump_name:
         dump = dump_name.split('@')
@@ -227,7 +229,7 @@ def upload():
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])
 def feedback(page_name):
     """ Write user feedback to file. """
-    if not page_name:
+    if not page_name  or page_name == '.gitignore':
         abort(404)
     feedback_all = []
     if 'username' in session:
@@ -289,6 +291,13 @@ def admin():
                 return redirect(url_for('admin'))
     return render_template('admin.html', context={"users": Admin.show_users()})
 
+
+@app.route('/search/', methods=['GET'])
+def search():
+    query = request.args.get('q', None)
+    if query is not None:
+        pass
+    return render_template('search.html', context={})
 
 @app.errorhandler(401)
 def unauthorized(error):
