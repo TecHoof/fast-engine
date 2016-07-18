@@ -4,19 +4,103 @@
     <title>{{ config['SITE_TITLE'] }} | {% block title %}Main{% endblock %}</title>
     <meta charset="UTF-8">
 
-    {# <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"> #}
+    <link href="{{ url_for('static', filename='css/marking.lib.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-default.css') }}" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
 
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-        <ul class=flashes>
-            {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container navbar-box">
+            <div class="navbar-logo inline-block">
+                <label>SPA Wiki</label>
+            </div>
+
+            <!-- <ul class="ul-h inline-block navbar-ul right">
+            </ul> -->
+        </div>
+
+        {% if 'username' in session %}
+            <div class="navbar-action">
+                <div class="container">
+                    <ul class="ul-h block col-10 ">
+                        <li><a href="{{ url_for('write') }}">new page</a></li>
+                        <li><a href="{{ url_for('feedback', page_name = "*") }}">feedbacks</a></li>
+                    </ul>
+                </div>
+            </div>
+            <br>
         {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+
+        <div class="container">
+            <div class="hr hr-2"></div>
+        </div>
+    </nav>
+
+    <!-- MESSAGES CONTAINER -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <ul class="flashes  ul-h">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container top-10">
+        <!-- LEFT CONTAINER -->
+        <div class="col-2 inline-block">
+            {% if 'username' in session %}
+                Hello, {{ session['username'] }} <a href="{{ url_for('logout') }}">Logout</a>
+
+                <div class="hr"></div>
+            {% endif %}
+
+            <h3>Search</h3>
+            <form action="{{ url_for('search') }}" class="form-search" method="GET">
+                <input type="text" name="q">
+                <input type="submit" class="btn btn-theme" value="ok">
+            </form>
+
+            <div class="hr"></div>
+
+            <h3>Main navigation</h3>
+            <ul class="ul-v">
+                <li><a href="/">Home</a></li>
+                <li><a href="#">Administrators</a></li>
+                <li><a href="#">Help</a></li>
+            </ul>
+
+            {% if 'username' in session %}
+                <div class="hr"></div>
+                <h3>Documentation</h3>
+                <ul class="ul-v">
+                    <li><a href="#">Tutorials</a></li>
+                </ul>
+            {% endif %}
+
+        </div>
+
+        <!-- BLOCK CONTENT -->
+        <div class="col-8 inline-block">
+            {% block content %}{% endblock %}
+
+            <div class="col-10">
+                <div class="hr hr-1 hr-dotted"></div>
+                <a href="#" target="_blank" class="powered pw-techoof inline-block"></a>
+                <a href="https://www.python.org/" target="_blank" class="powered pw-python inline-block"></a>
+                <div class="hr"></div>
+            </div>
+        </div>
+
+
+
+    </div>
+
 </body>
 </html>

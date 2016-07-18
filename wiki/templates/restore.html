@@ -6,10 +6,10 @@
 
 {% block content %}
     {% if context.dumps %}
-    Choose dump for restoring:
-    <ul class=dumps>
+    <h3>Choose dump for restoring:</h3>
+    <ul class="dumps ul-v">
         {% for dump in context.dumps %}
-            <li>
+            <li class="top-5">
                 {{ dump.hr_time }}:
                 <a href="{{ url_for("page", page_name=context.title + '@' + dump.timestamp) }}">View</a> |
                 <a href="{{ url_for("restore", dump_name=context.title + '@' + dump.timestamp) }}">Restore</a>

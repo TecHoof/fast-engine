@@ -101,7 +101,7 @@ def write():
     """ Create new page with <page_name> filename in <PAGES_FOLDER> const. """
     if request.method == 'POST':
         page_name = escape(request.form.get('title', None))
-        content = escape(request.form.get('content', None))
+        content = request.form.get('content', None)
         create = request.form.get('create', '0')  # default zero; TODO: rewrite this
         if not page_name or page_name == '.gitignore':
             flash('Enter correct title', 'error')

@@ -7,12 +7,30 @@
 {% block content %}
 
 <h2>Editor</h2>
-<form action="{{ url_for('write') }}" method="POST">
-    <input type="checkbox" name="create" value="1">
+{% if(context.title) %}
+    <label>You edit page <a href="{{ url_for("page", page_name=context.title) }}">{{ context.title }}</a>.</label>
+{% else %}
+    <label>Create new page</label>
+{% endif %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/nicEdit.js') }}"></script>
+<script type="text/javascript">
+	bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+</script>
+
+<form class="form-min top-5" action="{{ url_for('write') }}" method="POST">
     <input placeholder="Title post" title="title" type="text" name="title" value="{{ context.title }}">
-    <textarea placeholder="Body post" title="content" name="content">{{ context.content }}</textarea>
-    <input type="submit" value="submit">
-    <input type="reset" value="reset">
+    <br>
+    <br>
+    <textarea placeholder="Body post" title="content" cols="40" name="content">{{ context.content }}</textarea>
+    {% if(not context.title) %}
+        <input type="checkbox" name="create" value="1"> <small for="checkbox">Check create new page</small>
+    {% endif %}
+    <div class="hr"></div>
+    <div class="top-5">
+        <input class="btn btn-theme" type="submit" value="submit">
+        <input class="btn btn-theme" type="reset" value="reset">
+    </div>
 </form>
 
 {% endblock %}
