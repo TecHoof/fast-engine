@@ -1,0 +1,8 @@
+{
+  "SECRET_KEY": "SUPER_SECRET_SESSION_KEY",
+  "FIRST_START": true,
+  "SITE_TITLE": "FAST Engine",
+  "USERS_FOLDER": "users/",
+  "SETTINGS_FOLDER": "settings/",
+  "DEBUG": false
+}

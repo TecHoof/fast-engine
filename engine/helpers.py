@@ -14,7 +14,7 @@ from passlib.hash import sha256_crypt
 from flask import session, flash, redirect, url_for, abort, g, request, safe_join
 from flask.json import dump, load
 
-from wiki import app
+from engine import app
 
 
 def login_check(func):

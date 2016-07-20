@@ -10,18 +10,65 @@ import datetime
 from passlib.hash import sha256_crypt
 
 from flask import session, flash, request, render_template, redirect, url_for, abort, escape, safe_join
-from flask.json import load
+from flask.json import load, dump
 from werkzeug.utils import secure_filename
 
-from wiki import app
-from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
+from engine import app
+from engine.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
     settings_write, Admin, show_feedback, show_files, show_pages, show_feedback_all
 
 
 @app.route('/')
 def main():
     """ Main page handler """
+    if app.config['FIRST_START']:
+        return redirect(url_for('install'))
+    if app.config['MAINTENANCE']:
+        return render_template('maintenance.html')
     return render_template('main.html', content='<h1>This is main page!</h1>')
+
+
+@app.route('/install/', methods=['GET', 'POST'])
+def install():
+    """ Instalation handler """
+    if not app.config['FIRST_START']:  # can access only with FIRST_START == True
+        abort(403)
+    if request.method == 'POST':
+        secret_key = request.form.get('secret_key', None)
+        site_title = request.form.get('site_title', None)
+        admin_login = request.form.get('admin_login', None)
+        admin_password = request.form.get('admin_password', None)
+        if not secret_key or not site_title or not admin_login or not admin_password:
+            flash('Fill all fields!', 'error')
+            return redirect(url_for('install'))
+        config = {
+            "SECRET_KEY": secret_key,
+            "SITE_TITLE": site_title,
+            "USERS_FOLDER": app.root_path + '/users/',
+            "SETTINGS_FOLDER": app.root_path + '/settings/',
+            "FEEDBACK_FOLDER": app.static_folder + '/feedback/',
+            "PAGES_FOLDER": app.static_folder + '/pages/',
+            "DUMPS_FOLDER": app.static_folder + '/dumps/',
+            "UPLOAD_FOLDER": app.static_folder + '/files/',
+            "ALLOWED_EXTENSIONS": ["apng", "png", "jpg", "jpeg", "gif"],
+            "MAX_CONTENT_LENGTH": 16777216,
+            "ADMIN_LOGIN": admin_login,
+            "SESSION_COOKIE_NAME": "library",
+            "FIRST_START": False,
+            "MAINTENANCE": False,
+            "DEBUG": False,
+        }
+        app.config.update(config)
+        try:
+            with open(safe_join(app.root_path, 'config.json'), 'w') as f:
+                dump(config, f)
+            Admin.create_user(admin_login, admin_password)
+            flash('Success!', 'info')
+        except Exception:
+            import traceback
+            traceback.print_exc()
+        return redirect(url_for('main'))
+    return render_template('install.html')
 
 
 @app.route('/login/', methods=['POST', 'GET'])
@@ -49,7 +96,7 @@ def login():
         except FileNotFoundError:
             flash('User not exist!', 'error')
             return redirect(url_for('login', next=next_url))
-        except Exception:  # FIXME!!!
+        except Exception:
             abort(500)
         return redirect(next_url)
     return render_template('login.html')
@@ -166,7 +213,7 @@ def delete_page(page_name):
 @access_check
 def restore(dump_name):
     """ Restore page from dump storage """
-    if not dump_name  or dump_name == '.gitignore':
+    if not dump_name or dump_name == '.gitignore':
         abort(404)
     if '@' in dump_name:
         dump = dump_name.split('@')
@@ -277,7 +324,7 @@ def feedback_on_page(page_name):
 @access_check
 def admin():
     """ Admin panel handler. """
-    if session['username'] != app.config['SUPERADMIN_LOGIN']:
+    if session['username'] != app.config['ADMIN_LOGIN']:
         abort(403)
     if request.method == 'POST':
         form = request.form.get('form')

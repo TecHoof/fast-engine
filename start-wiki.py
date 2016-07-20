@@ -4,7 +4,7 @@ Startup file for site engine
 
 """
 
-from wiki import app
+from engine import app
 
 if __name__ == '__main__':
     app.run()
