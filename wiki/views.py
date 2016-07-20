@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from wiki import app
 from wiki.helpers import login_check, access_check, dump_page, show_dumps, allowed_file, file_from_url, settings_read, \
-    settings_write, Admin, show_feedback, show_files, show_pages
+    settings_write, Admin, show_feedback, show_files, show_pages, show_feedback_all
 
 
 @app.route('/')
@@ -72,9 +72,7 @@ def page(page_name):
     page_name = escape(page_name)
     content = ''
     settings = []
-    if '$' in page_name:  # check for feedback file
-        page_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
-    elif '@' in page_name:
+    if '@' in page_name:
         page_file = safe_join(app.config['DUMPS_FOLDER'], page_name)
     else:
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
@@ -229,10 +227,32 @@ def upload():
     return render_template('upload.html', context={"files": files})
 
 
+@app.route('/feedback/', methods=['GET'])
+@access_check
+def feedback():
+    """ View all feedback in folder"""
+    feedback_all = show_feedback_all()
+    return render_template('feedback_all.html', context={'feedback': feedback_all})
+
+
+@app.route('/feedback/<page_name>', methods=['GET'])
+@access_check
+def feedback_view(page_name):
+    """ Render page with content from feedback file """
+    if not page_name or page_name == '.gitignore':
+        abort(404)
+    feedback_info = page_name.split('$')
+    feedback_info[3] = datetime.datetime.fromtimestamp(int(feedback_info[3])).strftime('%d-%m-%Y %H:%M')
+    feedback_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
+    with open(feedback_file) as f:
+        content = f.read()
+    return render_template('feedback_view.html', context={'feedback': feedback_info, 'content': content})
+
+
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])
-def feedback(page_name):
+def feedback_on_page(page_name):
     """ Write user feedback to file. """
-    if not page_name  or page_name == '.gitignore':
+    if not page_name or page_name == '.gitignore':
         abort(404)
     feedback_all = []
     if 'username' in session:

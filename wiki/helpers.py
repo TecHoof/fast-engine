@@ -136,6 +136,20 @@ def show_feedback(page_name=None):
     return sorted(feedback_list)
 
 
+def show_feedback_all():
+    """ Return list of feedback """
+    feedback_list = []
+    for root, dirs, files in os.walk(app.config['FEEDBACK_FOLDER']):
+        for feedback_name in files:
+            feedback_name = feedback_name.split('$')
+            if '.gitignore' in feedback_name:
+                continue
+            feedback_name.append('$'.join(feedback_name))
+            feedback_name[3] = datetime.datetime.fromtimestamp(int(feedback_name[3])).strftime('%d-%m-%Y %H:%M')
+            feedback_list.append(feedback_name)
+    return sorted(feedback_list)
+
+
 def show_files():
     """ Return list of uploaded files """
     files_list = []
