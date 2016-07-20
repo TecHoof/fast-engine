@@ -132,8 +132,6 @@ def page(page_name):
         with open(page_file, 'r') as f:
             content = f.read()
     except FileNotFoundError:
-        import traceback
-        traceback.print_exc()
         abort(404)
     except Exception:
         abort(500)
@@ -282,7 +280,7 @@ def feedback():
     return render_template('feedback_all.html', context={'feedback': feedback_all})
 
 
-@app.route('/feedback/<page_name>', methods=['GET'])
+@app.route('/feedback/view/<page_name>', methods=['GET'])
 @access_check
 def feedback_view(page_name):
     """ Render page with content from feedback file """
