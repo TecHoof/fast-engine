@@ -41,6 +41,9 @@ def install():
         if not secret_key or not site_title or not admin_login or not admin_password:
             flash('Fill all fields!', 'error')
             return redirect(url_for('install'))
+        elif '.' in admin_login or '/' in admin_login:
+            flash('Invalid admin login!', 'error')
+            return redirect(url_for('install'))
         config = {
             "SECRET_KEY": secret_key,
             "SITE_TITLE": site_title,
@@ -65,8 +68,7 @@ def install():
             Admin.create_user(admin_login, admin_password)
             flash('Success!', 'info')
         except Exception:
-            import traceback
-            traceback.print_exc()
+            abort(500)
         return redirect(url_for('main'))
     return render_template('install.html')
 
@@ -114,7 +116,7 @@ def logout():
 @app.route('/page/<page_name>')
 def page(page_name):
     """ Render page with content from page file """
-    if not page_name or page_name == '.gitignore':
+    if not page_name or page_name == '.gitignore' or '.' in page_name or '/' in page_name:
         abort(404)
     page_name = escape(page_name)
     content = ''
@@ -144,9 +146,9 @@ def write():
     """ Create new page with <page_name> filename in <PAGES_FOLDER> const. """
     if request.method == 'POST':
         page_name = escape(request.form.get('title', None))
-        content = escape(request.form.get('content', None))
+        content = request.form.get('content', None)
         create = request.form.get('create', '0')  # default zero; TODO: rewrite this
-        if not page_name or page_name == '.gitignore':
+        if not page_name or page_name == '.gitignore' or '.' in page_name or '/' in page_name:
             flash('Enter correct title', 'error')
             return redirect(url_for('write'))
         page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
@@ -164,6 +166,8 @@ def write():
                 return redirect(url_for('page', page_name=page_name))
             except OSError:
                 flash('Can not save page!', 'error')
+            except Exception:
+                abort(500)
     return render_template('editor.html', context={})
 
 
@@ -173,7 +177,7 @@ def edit(page_name):
     """ Edit existed page with <page_name> title """
     content = ''
     page_name = escape(page_name)
-    if not page_name or page_name == '.gitignore':
+    if not page_name or page_name == '.gitignore' or '.' in page_name or '/' in page_name:
         abort(404)
     page_file = safe_join(app.config['PAGES_FOLDER'], page_name)
     try:
@@ -181,6 +185,8 @@ def edit(page_name):
             content = f.read()
     except OSError:
         abort(404)
+    except Exception:
+        abort(500)
     return render_template('editor.html', context={'title': page_name, 'content': content})
 
 
@@ -188,7 +194,7 @@ def edit(page_name):
 @access_check
 def delete_page(page_name):
     """ Delete page with <page_name> filename. """
-    if not page_name or page_name == '.gitignore':
+    if not page_name or page_name == '.gitignore' or '.' in page_name or '/' in page_name:
         abort(404)
     if '$' in page_name:
         page_file = safe_join(app.config['FEEDBACK_FOLDER'], page_name)
@@ -204,6 +210,8 @@ def delete_page(page_name):
         flash('Success!', 'info')
     except OSError:
         flash('That page does not exist!', 'error')
+    except Exception:
+        abort(500)
     return redirect(url_for('main'))
 
 
@@ -211,7 +219,7 @@ def delete_page(page_name):
 @access_check
 def restore(dump_name):
     """ Restore page from dump storage """
-    if not dump_name or dump_name == '.gitignore':
+    if not dump_name or dump_name == '.gitignore' or '.' in dump_name or '/' in dump_name:
         abort(404)
     if '@' in dump_name:
         dump = dump_name.split('@')
@@ -268,6 +276,8 @@ def upload():
             flash('Success!', 'info')
         except FileNotFoundError:
             flash('File not found!', 'error')
+        except Exception:
+            abort(500)
     files = show_files()
     return render_template('upload.html', context={"files": files})
 
@@ -297,7 +307,7 @@ def feedback_view(page_name):
 @app.route('/feedback/<page_name>', methods=['GET', 'POST'])
 def feedback_on_page(page_name):
     """ Write user feedback to file. """
-    if not page_name or page_name == '.gitignore':
+    if not page_name or page_name == '.gitignore' or '.' in page_name or '/' in page_name:
         abort(404)
     feedback_all = []
     if 'username' in session:
