@@ -19,12 +19,16 @@
 </script>
 
 <form class="form-min top-5" action="{{ url_for('write') }}" method="POST">
-    <input placeholder="Title post" title="title" type="text" name="title" value="{{ context.title }}">
-    <br>
-    <br>
+    {% if(context.title) %}
+        <input hidden placeholder="Title post" title="title" type="text" name="title" value="{{ context.title }}">
+    {% else %}
+        <input placeholder="Title post" title="title" type="text" name="title" value="{{ context.title }}">
+        <br>
+        <br>
+    {% endif %}
     <textarea placeholder="Body post" title="content" cols="40" name="content">{{ context.content }}</textarea>
     {% if(not context.title) %}
-        <input type="checkbox" name="create" value="1"> <small for="checkbox">Check create new page</small>
+        <input type="text" hidden name="create" value="1">
     {% endif %}
     <div class="hr"></div>
     <div class="top-5">

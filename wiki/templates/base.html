@@ -4,6 +4,8 @@
     <title>{{ config['SITE_TITLE'] }} | {% block title %}Main{% endblock %}</title>
     <meta charset="UTF-8">
 
+    <link rel="shortcut icon" href="{{ url_for('static', filename='css/img/favicon.png') }}" type="image/x-icon">
+
     <link href="{{ url_for('static', filename='css/marking.lib.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/theme-default.css') }}" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
@@ -93,6 +95,7 @@
             <div class="col-10">
                 <div class="hr hr-1 hr-dotted"></div>
                 <a href="#" target="_blank" class="powered pw-techoof inline-block"></a>
+                <a href="#" target="_blank" class="powered pr-powered inline-block"></a>
                 <a href="https://www.python.org/" target="_blank" class="powered pw-python inline-block"></a>
                 <div class="hr"></div>
             </div>

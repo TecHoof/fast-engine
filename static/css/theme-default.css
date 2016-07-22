@@ -58,6 +58,10 @@ a:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
     background: url("img/techoof.png") 100% 100% no-repeat;
 }
 
+.pr-powered {
+    background: url("img/pr-powered.png") 100% 100% no-repeat;
+}
+
 .pw-python {
     background: url("img/python.png") 100% 100% no-repeat;
 }
