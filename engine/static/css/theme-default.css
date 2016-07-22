@@ -1,0 +1,67 @@
+/*DEFAULT THEME*/
+
+body { background-color: #f1f1f1 }
+
+* { font-family: 'Source Sans Pro', sans-serif; color: #3E4349; }
+
+a { color: #875AA5; border-bottom: 1px dotted #875AA5; }
+
+a:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
+
+.hr {
+    border-color: #875AA5; border-style: solid;
+}
+
+.hr-dotted {
+    border-style: dotted;
+}
+
+/*73AD21*/
+
+.btn { border-color: #3E4349; background-color: transparent; }
+.btn-theme:hover {
+    opacity: 0.6; filter: alpha(Opacity=60); /* IE */
+}
+
+.form-min input[type=text],
+.form-min input[type=password],
+.form-min textarea {
+    width: 100%;
+    max-width: 100%;
+    padding:5px;
+    border:none;
+    background-color: transparent;
+    border-bottom: 1px solid #cfbddb;
+
+    -webkit-box-shadow: inset 0 0 0 50px #f1f1f1;
+    -webkit-text-fill-color: #3E4349;
+}
+
+.form-search input {
+    padding:5px;
+    border:none;
+    background-color: transparent;
+    border-bottom: 1px solid #cfbddb;
+
+    -webkit-box-shadow: inset 0 0 0 50px #f1f1f1;
+    -webkit-text-fill-color: #3E4349;
+}
+
+.powered {
+    background-size: contain;
+    width: 80px;
+    height: 20px;
+    border: none;
+}
+
+.pw-techoof {
+    background: url("img/techoof.png") 100% 100% no-repeat;
+}
+
+.pr-powered {
+    background: url("img/pr-powered.png") 100% 100% no-repeat;
+}
+
+.pw-python {
+    background: url("img/python.png") 100% 100% no-repeat;
+}

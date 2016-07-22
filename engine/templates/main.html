@@ -5,12 +5,6 @@
 {% endblock %}
 
 {% block content %}
-    {% if 'username' in session %}
-        Hello, {{ session['username'] }} <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-        Please, <a href="{{ url_for('login') }}">login</a>
-    {% endif %}
-    <br>
     {% autoescape none %}
     {{ content }}
     {% endautoescape %}

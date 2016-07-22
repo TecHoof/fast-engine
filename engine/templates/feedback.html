@@ -6,26 +6,39 @@
 
 {% block content %}
     {% if 'username' in session %}
-        Feedback:<br>
-        <ul>
+        <h3>Feedback:</h3>
+        <ul class="ul-v">
         {% for feedback in context.feedback %}
-                <li>
-                    User: {{ feedback[1] }} Email: {{ feedback[2] }} Time: {{ feedback[3] }}
-                    <a href="{{ url_for('page', page_name=feedback[0]) }}">
-                        Show
-                    </a>
-                    <a href="{{ url_for('delete', page_name=feedback[0] }}">
-                        Delete
-                    </a>
+                <li class="top-10">
+                    User: {{ feedback[1] }} <br>
+                    Email: {{ feedback[2] }} <br>
+                    Time: {{ feedback[3] }} <br>
+                    <ul class="ul-h">
+                        <li><a href="{{ url_for('page', page_name=feedback[0]) }}">Show</a></li>
+                        <li><a href="{{ url_for('delete_page', page_name=feedback[0]) }}">Delete</a></li>
+                    </ul>
+
                 </li>
+                <li class="top-10">
+                    User: {{ feedback[1] }} <br>
+                    Email: {{ feedback[2] }} <br>
+                    Time: {{ feedback[3] }} <br>
+                    <ul class="ul-h">
+                        <li><a href="{{ url_for('page', page_name=feedback[0]) }}">Show</a></li>
+                        <li><a href="{{ url_for('delete_page', page_name=feedback[0]) }}">Delete</a></li>
+                    </ul>
+
+                </li>
+
         {% endfor %}
         </ul>
+    {% else %}
+        Write your feedback on <a href="{{ url_for("page", page_name=context.title) }}">{{ context.title }}</a>
+        <form action="" method="POST" class="form-min">
+            <input name="name" type="text" placeholder="Your name">
+            <input name="email" type="text" placeholder="Your email">
+            <textarea name="content" placeholder="Your feedback"></textarea>
+            <input class="btn btn-theme" type="submit">
+        </form>
     {% endif %}
-    Write your feedback on <a href="{{ url_for("page", page_name=context.title) }}">{{ context.title }}</a>
-<form action="" method="POST">
-    <input name="name" type="text" placeholder="Your name">
-    <input name="email" type="text" placeholder="Your email">
-    <textarea name="content" placeholder="Your feedback"></textarea>
-    <input type="submit">
-</form>
 {% endblock %}

@@ -5,19 +5,16 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="GET">
+    <!-- <form action="" method="GET">
         <input type="text" name="q">
         <input type="submit">
-    </form>
+    </form> -->
     {% if context.result %}
-        Result:
-        <ul>
+        <h3>Result:</h3>
+        <ul class="ul-v">
         {% for page in context.result %}
-            <li>
+            <li class="top-5">
                 <a href="{{ url_for('page', page_name=page.name) }}">{{ page.name }}</a>
-                <ul>
-                    <li>{{ page.line }}</li>
-                </ul>
             </li>
         {% endfor %}
         </ul>
