@@ -60,6 +60,7 @@ def install():
             "FIRST_START": False,
             "MAINTENANCE": False,
             "DEBUG": False,
+            "VERSION": "0.8.1",
         }
         app.config.update(config)
         try:
@@ -320,7 +321,7 @@ def feedback_on_page(page_name):
         file = safe_join(app.config['FEEDBACK_FOLDER'], '$'.join([page_name, name, email, timestamp]))
         if not name or not email or not content:
             flash('Please, fill all fields!', 'error')
-            return redirect(url_for('feedback', page_name=page_name))
+            return redirect(url_for('feedback_on_page', page_name=page_name))
         with open(file, 'w') as f:
             f.write(content)
         flash('Thank you for feedback.', 'info')
