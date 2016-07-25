@@ -1,3 +1,21 @@
-<div style="text-align: center;">
-  <h1>This site is under development</h1>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ config['SITE_TITLE'] }} | {% block title %}Main{% endblock %}</title>
+    <meta charset="UTF-8">
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='css/img/favicon.png') }}" type="image/x-icon">
+
+    <link href="{{ url_for('static', filename='css/marking.lib.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-default.css') }}" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <div class="hr"></div>
+        <h1>This site is under development</h1>
+        <div class="hr hr-1 hr-dotted"></div>
+    </div>
+</body>
+</html>

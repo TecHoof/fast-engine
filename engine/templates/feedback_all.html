@@ -6,7 +6,7 @@
 
 {% block content %}
     {% if context.feedback %}
-        <ul>
+        <ul class="ul-v">
         {% for feedback in context.feedback %}
             <li>
             Page name: {{ feedback[0] }} User: {{ feedback[1] }} Email: {{ feedback[2] }} Time: {{ feedback[3] }}

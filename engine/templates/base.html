@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='css/img/favicon.png') }}" type="image/x-icon">
 
-    <link href="{{ url_for('static', filename='css/marking.lib.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/marking-min.lib.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/theme-default.css') }}" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
 
@@ -17,7 +17,7 @@
     <nav class="navbar">
         <div class="container navbar-box">
             <div class="navbar-logo inline-block">
-                <label>SPA Wiki</label>
+                <label>{{ config['SITE_TITLE'] }}</label>
             </div>
 
             <!-- <ul class="ul-h inline-block navbar-ul right">
@@ -29,7 +29,7 @@
                 <div class="container">
                     <ul class="ul-h block col-10 ">
                         <li><a href="{{ url_for('write') }}">new page</a></li>
-                        <li><a href="{{ url_for('feedback', page_name = "*") }}">feedbacks</a></li>
+                        <li><a href="{{ url_for('feedback') }}">feedbacks</a></li>
                     </ul>
                 </div>
             </div>
@@ -59,14 +59,13 @@
         <div class="col-2 inline-block">
             {% if 'username' in session %}
                 Hello, {{ session['username'] }} <a href="{{ url_for('logout') }}">Logout</a>
-
                 <div class="hr"></div>
             {% endif %}
 
             <h3>Search</h3>
             <form action="{{ url_for('search') }}" class="form-search" method="GET">
-                <input type="text" name="q">
-                <input type="submit" class="btn btn-theme" value="ok">
+                <input type="text" name="q"></input>
+                <button type="submit" class="btn btn-theme btn-search" name="button">ok</button>
             </form>
 
             <div class="hr"></div>
@@ -74,8 +73,11 @@
             <h3>Main navigation</h3>
             <ul class="ul-v">
                 <li><a href="/">Home</a></li>
-                <li><a href="#">Administrators</a></li>
-                <li><a href="#">Help</a></li>
+                <li>
+                    {% if 'username' not in session %}
+                        <a href="{{ url_for('login') }}">Login</a>
+                    {% endif %}
+                </li>
             </ul>
 
             {% if 'username' in session %}

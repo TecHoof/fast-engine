@@ -1,30 +1,34 @@
 /*DEFAULT THEME*/
-
+* { font-family: 'Source Sans Pro', sans-serif; color: #3E4349; }
 body { background-color: #f1f1f1 }
 
-* { font-family: 'Source Sans Pro', sans-serif; color: #3E4349; }
-
+/*LINKS*/
 a { color: #875AA5; border-bottom: 1px dotted #875AA5; }
-
 a:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
+/*END LINKS*/
 
-.hr {
-    border-color: #875AA5; border-style: solid;
-}
+/*NAVBAR*/
+.navbar { }
+.navbar-box { padding: 8px; }
+.navbar-action { padding-top: 5px; padding-bottom: 5px; }
+.navbar-logo { font-size: 30px; }
+/*END NAVBAR*/
 
-.hr-dotted {
-    border-style: dotted;
-}
+/*LINE HR*/
+.hr { border-color: #875AA5; border-style: solid; }
+.hr-dotted { border-style: dotted; }
+/*END LINE HR*/
 
-/*73AD21*/
-
+/*BTN*/
 .btn { border-color: #3E4349; background-color: transparent; }
-.btn-theme:hover {
-    opacity: 0.6; filter: alpha(Opacity=60); /* IE */
-}
+.btn-theme:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
+.btn-search { background: url("img/search.png") 100% 100% no-repeat; background-size: contain; border: none; color: transparent; }
+/*END BTN*/
 
+/*FORMS*/
 .form-min input[type=text],
 .form-min input[type=password],
+.form-min select,
 .form-min textarea {
     width: 100%;
     max-width: 100%;
@@ -34,9 +38,7 @@ a:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
     border-bottom: 1px solid #cfbddb;
 
     -webkit-box-shadow: inset 0 0 0 50px #f1f1f1;
-    -webkit-text-fill-color: #3E4349;
 }
-
 .form-search input {
     padding:5px;
     border:none;
@@ -44,24 +46,12 @@ a:hover { opacity: 0.6; filter: alpha(Opacity=60); /* IE */ }
     border-bottom: 1px solid #cfbddb;
 
     -webkit-box-shadow: inset 0 0 0 50px #f1f1f1;
-    -webkit-text-fill-color: #3E4349;
 }
+/*END FORMS*/
 
-.powered {
-    background-size: contain;
-    width: 80px;
-    height: 20px;
-    border: none;
-}
-
-.pw-techoof {
-    background: url("img/techoof.png") 100% 100% no-repeat;
-}
-
-.pr-powered {
-    background: url("img/pr-powered.png") 100% 100% no-repeat;
-}
-
-.pw-python {
-    background: url("img/python.png") 100% 100% no-repeat;
-}
+/*POWERED BLOCKS*/
+.powered { background-size: contain; width: 80px; height: 20px; border: none; }
+.pw-techoof { background: url("img/techoof.png") 100% 100% no-repeat; }
+.pr-powered { background: url("img/pr-powered.png") 100% 100% no-repeat; }
+.pw-python { background: url("img/python.png") 100% 100% no-repeat; }
+/*END POWERED BLOCKS*/

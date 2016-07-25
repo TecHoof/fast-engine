@@ -19,17 +19,6 @@
                     </ul>
 
                 </li>
-                <li class="top-10">
-                    User: {{ feedback[1] }} <br>
-                    Email: {{ feedback[2] }} <br>
-                    Time: {{ feedback[3] }} <br>
-                    <ul class="ul-h">
-                        <li><a href="{{ url_for('page', page_name=feedback[0]) }}">Show</a></li>
-                        <li><a href="{{ url_for('delete_page', page_name=feedback[0]) }}">Delete</a></li>
-                    </ul>
-
-                </li>
-
         {% endfor %}
         </ul>
     {% else %}

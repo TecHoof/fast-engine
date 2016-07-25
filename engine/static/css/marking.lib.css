@@ -1,80 +1,38 @@
 
 *, *:focus, *:active { outline: none !important; text-decoration: none; margin: 0; padding: 0; box-shadow: none; }
 
+.container { width: 80%; margin: 0 auto; }
+.btn { border: 1px solid; padding: 2px 4px 2px 4px; cursor: pointer; }
+
 /*LISTS*/
-.ul-h li {
-    display: inline-block;
-    padding-right: 5px
-}
-
-.ul-v {
-    list-style-type: none;
-}
-
-.ul-v li {
-    padding-bottom: 3px;
-}
+.ul-h li { display: inline-block; padding-right: 10px }
+.ul-v { list-style-type: none; }
+.ul-v li { padding-bottom: 3px; }
 /*END LISTS*/
 
+/*LINKS HR*/
 .hr { height: 5px; margin: 10px 0 10px 0; width: 100%; border-width: 0px; }
 .hr-1 { border-width: 0px 0px 1px 0px; }
 .hr-2 { border-width: 0px 0px 2px 0px; }
 .hr-3 { border-width: 0px 0px 3px 0px; }
 .hr-4 { border-width: 0px 0px 4px 0px; }
 .hr-5 { border-width: 0px 0px 5px 0px; }
-
-.container {
-    width: 80%;
-    margin: 0 auto;
-}
-
-.btn {
-    border: 1px solid;
-    padding: 2px 4px 2px 4px;
-    cursor: pointer;
-}
+/*LINKS HR*/
 
 /*FORMS*/
-.form * {
-    margin: 8px 0 8px 0;
-}
-
+.form * { margin: 8px 0 8px 0; }
 .form-control {
     display: block;
     width: 100%;
     padding: 5px;
-
     border-width: 1px;
+    background-color: none;
 
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box;         /* Opera/IE 8+ */
-
-    background-color: none;
 }
 /*END FORMS*/
-
-/*NAVBAR STYLE*/
-.navbar {
-
-}
-
-.navbar-box {
-    padding: 8px;
-}
-
-.navbar-action {
-    padding: 5px;
-}
-
-.navbar-logo {
-    font-size: 30px;
-}
-
-.navbar-ul {
-    height: 100%;
-}
-/*END NAVBAR STYLE*/
 
 /*DISPLAY*/
 .inline { display: inline; }
@@ -138,16 +96,13 @@
 /*END MARGIN*/
 
 /*TEXT COLORS*/
-
 .error { color: #ff3333; }
 .info { color: #5bc0de; }
 .success { color: #5cb85c; }
-
 /*END TEXT COLORS*/
 
 /*TEXT POSITION*/
 .tx-center { text-align: center; }
 .tx-right { text-align: right; }
 .tx-left { text-align: left; }
-
 /*END TEXT POSITION*/

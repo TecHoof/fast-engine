@@ -12,10 +12,8 @@
             <li><a href="{{ url_for('restore', dump_name = context.title) }}">restore</a></li>
             <li><a href="{{ url_for('delete_page', page_name = context.title) }}">delete page</a></li>
         {% endif %}
-        <li><a href="{{ url_for('feedback', page_name = context.title) }}">feedback</a></li>]
+        <li><a href="{{ url_for('feedback_on_page', page_name = context.title) }}">feedback</a></li>]
     </ul>
-
-
     <br>
     {% autoescape none %}
         {{ context.content }}
