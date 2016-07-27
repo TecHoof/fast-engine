@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ context.title }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ context.title }}</h1>
+    <ul class="ul-h">[
+        {% if 'username' in session %}
+            <li><a href="{{ url_for('write') + context.title }}">edit page</a></li>
+            <li><a href="{{ url_for('restore', dump_name = context.title) }}">restore</a></li>
+            <li><a href="{{ url_for('delete_page', page_name = context.title) }}">delete page</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('feedback_on_page', page_name = context.title) }}">feedback</a></li>]
+    </ul>
+    <br>
+    {% autoescape none %}
+        {{ context.content }}
+    {% endautoescape %}
+    <div class="hr"></div>
+    <h4>Last changed on {{ context.settings.last_change }} by {{ context.settings.last_author }}</h4>
+{% endblock %}

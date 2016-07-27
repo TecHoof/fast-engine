@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Please, login
+{% endblock %}
+
+{% block content %}
+    You don't have enough permissions to see this!
+    <a href="{{ url_for('login', next=g['login_back']) }}">Login</a> or <a href="{{ url_for('main') }}">go away!</a>
+    <h5>P.S. It's 401 error</h5>
+{% endblock %}

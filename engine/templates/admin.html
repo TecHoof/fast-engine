@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin panel
+{% endblock %}
+
+{% block content %}
+<div class="block">
+    <form action="" method="POST" class="form-min">
+        Create user:
+        <input type="hidden" name="form" value="create_user">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="submit">
+    </form>
+</div>
+
+<div class="hr hr-dotted"></div>
+
+<div class="block">
+    <form action="" method="POST" class="form-min">
+        Delete user:
+        <input type="hidden" name="form" value="delete_user">
+        <select name="username">
+            {% for user in context.users %}
+            <option> {{ user }} </option>
+            {% endfor %}
+        </select>
+        <input type="submit">
+    </form>
+</div>
+
+{{ context }}
+{% endblock %}

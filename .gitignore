@@ -1,6 +1,10 @@
 !.gitignore
 
+engine/config-dev.json
+
+*__pycache__*
 .idea/
 .env/
 
 *.log
+*.db

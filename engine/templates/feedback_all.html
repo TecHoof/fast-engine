@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Feedback
+{% endblock %}
+
+{% block content %}
+    {% if context.feedback %}
+        <ul class="ul-v">
+        {% for feedback in context.feedback %}
+            <li>
+            Page name: {{ feedback[0] }} User: {{ feedback[1] }} Email: {{ feedback[2] }} Time: {{ feedback[3] }}
+            <a href="{{ url_for('feedback_view', page_name=feedback[4]) }}">
+                Show
+            </a>
+            <a href="{{ url_for('delete_page', page_name=feedback[4]) }}">
+                Delete
+            </a>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

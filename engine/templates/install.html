@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Installation
+{% endblock %}
+
+{% block content %}
+
+<h1>INSTALLATION PAGE</h1>
+<br>
+
+<form action="" method="POST" class="form-min col-3">
+    <input type="text" name="site_title" value="FAST Engine" placeholder="Site title">
+    <input type="text" name="admin_login" placeholder="Admin login">
+    <input type="password" name="admin_password" placeholder="Admin password">
+    <input type="text" name="secret_key" placeholder="Secret key">
+    <div class="hr"></div>
+    <input type="submit" class="btn btn-theme">
+</form>
+{% endblock %}
