@@ -8,3 +8,6 @@ engine/config-dev.json
 
 *.log
 *.db
+
+.pythoscope/
+tests/

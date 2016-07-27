@@ -30,7 +30,7 @@ def main():
 
 @app.route('/install/', methods=['GET', 'POST'])
 def install():
-    """ Instalation handler """
+    """ Installation handler """
     if not app.config['FIRST_START']:  # can access only with FIRST_START == True
         abort(403)
     if request.method == 'POST':
